@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from .registros import registros
+from .models import Registro
+from .serializers import RegistroSerializer
 
 # Create your views here.
 
@@ -21,14 +21,13 @@ def getRoutes(request):
 
 @api_view(['GET'])
 def getRegistros(request):
-    return Response(registros)
+    registros = Registro.objects.all()
+    serializer = RegistroSerializer(registros, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def getRegistro(request, pk):
-    registro = None
-    for i in registros:
-        if i['_id'] == pk:
-            registro = i
-            break
+    registro = Registro.objects.get(_id=pk)
+    serializer = RegistroSerializer(registro, many=False)
 
-    return Response(registro)
+    return Response(serializer.data)
